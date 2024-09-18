@@ -1,5 +1,5 @@
 data "template_file" "k3s_cp_1_init" {
-  template = "${file("${path.module}/control_plane_cloud_init.tpl")}"
+  template = "${file("${path.module}/templates/control_plane_cloud_init.tpl")}"
 
   vars = {
    k3s_cluster_token = "${var.k3s_cluster_token}"
@@ -21,11 +21,11 @@ resource "hcloud_server" "k3s_cp_1" {
   }
   user_data = "${data.template_file.k3s_cp_1_init.rendered}"
   ssh_keys = [ var.ssh_key_name ]
-  depends_on = [hcloud_network_subnet.private_network_subnet]
+  depends_on = [hcloud_network_subnet.private_network_subnet, hcloud_ssh_key.default, hcloud_server.k3s_bastion]
 }
 
 data "template_file" "k3s_cp_add_init" {
-  template = "${file("${path.module}/control_plane_cloud_init_add.tpl")}"
+  template = "${file("${path.module}/templates/control_plane_cloud_init_add.tpl")}"
 
   vars = {
    k3s_cluster_token = "${var.k3s_cluster_token}"
@@ -48,6 +48,6 @@ resource "hcloud_server" "k3s_cp_n" {
   }
   user_data = "${data.template_file.k3s_cp_add_init.rendered}"
   ssh_keys = [ var.ssh_key_name ]
-  depends_on = [hcloud_network_subnet.private_network_subnet, hcloud_server.k3s_cp_1]
+  depends_on = [hcloud_network_subnet.private_network_subnet, hcloud_server.k3s_cp_1, hcloud_ssh_key.default]
 
 }
