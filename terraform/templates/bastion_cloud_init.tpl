@@ -6,10 +6,6 @@ write_files:
     content: |
       ${indent(6, id_rsa)}
     permissions: "0600"
-  - path: /root/nginx.yaml
-    content: |
-      ${indent(6, nginx_ingress)}
-    permissions: "0600"
 runcmd:
   - iptables -t nat -A POSTROUTING -s '10.0.1.0/24' -o eth0  -j MASQUERADE
   - echo 1 > /proc/sys/net/ipv4/ip_forward
@@ -24,6 +20,3 @@ runcmd:
   - ssh-keyscan -H 10.0.1.2 >> /root/.ssh/known_hosts
   - scp 10.0.1.2:/etc/rancher/k3s/k3s.yaml /root/.kube/config
   - sed -i "s/127.0.0.1/10.0.1.2/g" /root/.kube/config
-  - kubectl apply -f /root/nginx.yaml
-  - kubectl -n kube-system apply -f https://github.com/hetznercloud/hcloud-cloud-controller-manager/releases/download/v1.13.2/ccm-networks.yaml
-  - kubectl -n kube-system create secret generic hcloud --from-literal=token=${k3s_cluster_token}
