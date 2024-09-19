@@ -1,0 +1,11 @@
+---
+- name: Nginx Config
+  hosts: ansible
+  vars_files:
+    - "{{ env }}.yml"
+  connection: local
+  tasks:
+  - name: create nginx config from j2
+    ansible.builtin.template:
+      src: templates/10_kubernetes_reverse_proxy_lb.j2
+      dest: files/10_kubernetes_reverse_proxy_lb

@@ -1,0 +1,52 @@
+---
+- name: Install and configure nginx for static website hosting
+  hosts: bastion
+  vars_files:
+    - "{{ env }}.yml"
+  tasks:
+    - name: Install nginx
+      apt:
+        name: nginx
+        state: latest
+        update_cache: yes
+    - name: Install cerbot
+      apt:
+        name: 
+          - certbot
+          - python3-certbot-nginx
+        state: latest
+        update_cache: yes
+    # - name: Obtain SSL Cert
+    #  ansible.builtin.command: "certbot certonly --manual -d *.k8s.{{ domain_name }} --non-interactive --agree-tos --email {{ email }} --no-eff-email --no-redirect"
+    #  args:
+    #    creates: "/etc/letsencrypt/live/{{ domain_name }}/privkey.pem"
+    - name: Setup Renew Cert Cron
+      cron:
+        name: "renew_ssl"
+        user: "root"
+        hour: "0"
+        minute: "0"
+        weekday: "*"
+        job: "certbot renew --manual --quiet"
+        state: present
+    - name: Remove default nginx configuration
+      file:
+        path: /etc/nginx/sites-enabled/default
+        state: absent
+    - name: Add nginx configuration
+      copy:
+        src: files/10_kubernetes_reverse_proxy_lb
+        dest: /etc/nginx/sites-available/
+        owner: root
+        group: root
+        mode: '0644'
+    - name: Enable website configuration
+      file:
+        src: /etc/nginx/sites-available/10_kubernetes_reverse_proxy_lb
+        dest: /etc/nginx/sites-enabled/10_kubernetes_reverse_proxy_lb
+        state: link
+    - name: Ensure nginx is running
+      systemd:
+        name: nginx
+        state: started
+        enabled: yes

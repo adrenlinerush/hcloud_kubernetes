@@ -1,0 +1,24 @@
+upstream k8s {    
+  {% for host in groups['k3s'] %}
+  server {{ hostvars[host].ansible_host }}
+  {% endfor %}
+}
+server {    
+  listen 80;    
+  server_name *.k8s.{{ domain_name}};
+  location / {       
+    proxy_pass http://k8s;   
+  }
+}
+
+server {    
+  listen 443;    
+  server_name *.k8s.{{ domain_name}};
+
+  ssl_certificate /etc/letsencrypt/live/*.k8s.{{ domain_name }}/fullchain.pem;
+  ssl_certificate_key /etc/letsencrypt/live/*.k8s.{{ domain_name }}/privkey.pem;
+
+  location / {       
+    proxy_pass http://k8s;   
+  }
+}

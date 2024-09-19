@@ -4,7 +4,6 @@ data "template_file" "bastion_init" {
   vars = {
    id_rsa = file("~/.ssh/id_rsa")
    k3s_cluster_token = "${var.k3s_cluster_token}"
-   nginx_ingress = file("${path.module}/files/nginx.yaml")
   }
 }
 

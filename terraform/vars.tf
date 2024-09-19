@@ -12,3 +12,6 @@ variable "number_worker_nodes" {
   type = number
   default = 3
 }
+variable "dns_name" {
+  type = string
+}

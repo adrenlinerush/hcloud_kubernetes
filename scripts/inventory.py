@@ -16,29 +16,34 @@ bastion = []
 for server in servers:
     if "adrenlinerush.net" in server.name:
         pets.append(server)
-    elif "k3s_cp" in server.name:
+    elif "k3s-cp" in server.name:
         cp.append(server)
-    elif "k3s_wn" in server.name:
+    elif "k3s-wn" in server.name:
         wn.append(server)
     elif "bastion" in server.name:
         bastion.append(server)
-
-print("[Pets]")
+print("[ansible]")
+print("localhost")
+print("\n[pets]")
 for server in pets:
     try:
-      print(server.name + " " + server.public_net.ipv4.ip)
+      print(server.name + " ansible_host=" + server.public_net.ipv4.ip)
     except:
-      print(server.name + " " + server.private_net[0].ip)
+      print(server.name + " ansible_host=" + server.private_net[0].ip)
 
-print("\n[k3s:control]")
+print("\n[k3s]")
+print("\n[k3s:children]")
+print("controlers\nworkers")
+print("\n[controlers]")
 for server in cp:
-    print(server.name + " " + server.private_net[0].ip)
+    print(server.name + " ansible_host=" + server.private_net[0].ip + " ansible_user=root")
 
-print("\n[k3s:worker]")
+print("\n[workers]")
 for server in wn:
-    print(server.name + " " + server.private_net[0].ip)
+    print(server.name + " ansible_host=" + server.private_net[0].ip + " ansible_user=root")
 
 print("\n[bastion]")
 for server in bastion:
-    print(server.name + " " + server.public_net.ipv4.ip)
-
+    print(server.name + " ansible_host=" + server.public_net.ipv4.ip + " ansible_user=root")
+    print("\n[k3s:vars]")
+    print("ansible_ssh_common_args='-o ProxyJump=root@"+server.public_net.ipv4.ip+" -o StrictHostKeyChecking=no'")
