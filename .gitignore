@@ -1,4 +1,4 @@
-.env
+.env*
 terraform/.terraform.lock.hcl
 terraform/.terraform/
 terraform/terraform.tfstate
@@ -8,3 +8,4 @@ scripts/venv/
 ansible/inventory
 ansible/files/10_kubernetes_reverse_proxy_lb
 ansible/dev.yml
+ansible/prod.yml

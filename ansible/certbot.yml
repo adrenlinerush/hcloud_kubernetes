@@ -1,0 +1,44 @@
+---
+- name: Install and configure ssl certs
+  hosts: bastion
+  vars_files:
+    - "{{ env }}.yml"
+  tasks:
+    - name: Install certbot and deps
+      apt:
+        name:
+          - certbot
+          - python3-certbot-nginx
+          - curl
+          - jq
+    - name: Register certbot
+      shell: |
+        certbot -n register --agree-tos --email {{ email }}
+        touch /etc/letsencrypt/.registered
+      args:
+        creates: /etc/letsencrypt/.registered
+    - name: Setup cronjob for renewal
+      cron:
+        name: certbot-renewal
+        job: "/bin/bash -lc '/usr/local/bin/certbot -q renew'"
+        minute: "0"
+        hour: "14"
+    - name: Download hetzner auth
+      ansible.builtin.get_url:
+        url: https://raw.githubusercontent.com/dschoeffm/hetzner-dns-certbot/master/certbot-hetzner-auth.sh 
+        dest: /usr/local/bin/certbot-hetzner-auth.sh 
+        mode: '0755'
+    - name: Download hetzner cleanup
+      ansible.builtin.get_url:
+        url: https://raw.githubusercontent.com/dschoeffm/hetzner-dns-certbot/master/certbot-hetzner-cleanup.sh
+        dest: /usr/local/bin/certbot-hetzner-cleanup.sh 
+        mode: '0755'
+    - name: Set hetner token
+      copy:
+        content: "{{ lookup('ansible.builtin.env', 'TF_VAR_hcloud_dns_token') }}"
+        dest: /etc/hetzner-dns-token
+    - name: 'Get certificate'
+      command: '/usr/bin/certbot certonly --manual --preferred-challenges=dns --manual-auth-hook /usr/local/bin/certbot-hetzner-auth.sh --manual-cleanup-hook /usr/local/bin/certbot-hetzner-cleanup.sh -d "*.k8s.{{ domain_name }}"'
+      args:
+        creates: '/etc/letsencrypt/live/k8s.{{ domain_name }}'
+      ignore_errors: true

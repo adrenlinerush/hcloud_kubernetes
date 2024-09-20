@@ -9,26 +9,6 @@
         name: nginx
         state: latest
         update_cache: yes
-    - name: Install cerbot
-      apt:
-        name: 
-          - certbot
-          - python3-certbot-nginx
-        state: latest
-        update_cache: yes
-    # - name: Obtain SSL Cert
-    #  ansible.builtin.command: "certbot certonly --manual -d *.k8s.{{ domain_name }} --non-interactive --agree-tos --email {{ email }} --no-eff-email --no-redirect"
-    #  args:
-    #    creates: "/etc/letsencrypt/live/{{ domain_name }}/privkey.pem"
-    - name: Setup Renew Cert Cron
-      cron:
-        name: "renew_ssl"
-        user: "root"
-        hour: "0"
-        minute: "0"
-        weekday: "*"
-        job: "certbot renew --manual --quiet"
-        state: present
     - name: Remove default nginx configuration
       file:
         path: /etc/nginx/sites-enabled/default
