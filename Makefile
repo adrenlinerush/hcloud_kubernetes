@@ -5,6 +5,8 @@ deploy_devl:
 	cd ansible && ansible-playbook -e env=dev -i inventory create_nginx_config.yml 
 	cd ansible && ansible-playbook -e env=dev -i inventory certbot.yml 
 	cd ansible && ansible-playbook -e env=dev -i inventory nginx_deploy.yml 
+	cd ansible && ansible-playbook -e env=dev -i inventory container_registry.yml
+	
 
 destroy_devl:
 	cd terraform && terraform destroy --var-file=devl.tfvars -auto-approve

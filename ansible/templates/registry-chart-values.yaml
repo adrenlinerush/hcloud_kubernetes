@@ -1,0 +1,10 @@
+---
+replicaCount: 1
+persistence:
+  enabled: true
+  size: 60Gi
+  deleteEnabled: true
+  storageClass: local-path
+  existingClaim: docker-registry-pv-claim
+secrets:
+  htpasswd: {{ lookup('ansible.builtin.env', 'HTPASSWD') }}

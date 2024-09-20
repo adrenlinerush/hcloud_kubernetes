@@ -1,0 +1,53 @@
+---
+- name: Deploy Docker Registry
+  hosts: bastion
+  vars_files:
+    - "{{ env }}.yml"
+  tasks:
+    - name: Install deps
+      apt:
+        name:
+          - python3-kubernetes
+          - python3-yaml
+          - python3-requests
+          - python3-jsonpatch
+    - name: Copy PVC defintion
+      copy:
+        src: files/registry-pvc.yaml
+        dest: /root/registry-pvc.yaml
+        owner: root
+        group: root
+        mode: '0644'
+    - name: Create namespace
+      kubernetes.core.k8s:
+        name: container-registry
+        api_version: v1
+        kind: Namespace
+        state: present
+    - name: create persistent volume claim
+      kubernetes.core.k8s:
+        state: present
+        src: /root/registry-pvc.yaml
+    - name: create chart.yaml
+      ansible.builtin.template:
+        src: templates/registry-chart-values.yaml
+        dest: /root/registry-chart-values.yaml
+    - name: Add twuni/docker-registry helm charts
+      kubernetes.core.helm_repository:
+        name: twuni
+        repo_url: https://helm.twun.io
+    - name: Deploy twuni/docker-registry
+      kubernetes.core.helm:
+        name: container-registry
+        chart_ref: twuni/docker-registry
+        release_namespace: container-registry
+        values_files:
+          - /root/registry-chart-values.yaml
+    - name: create registry-ingress.yaml
+      ansible.builtin.template:
+        src: templates/registry-ingress.yaml
+        dest: /root/registry-ingress.yaml
+    - name: create ingress
+      kubernetes.core.k8s:
+        state: present
+        src: /root/registry-ingress.yaml
