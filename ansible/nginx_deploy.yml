@@ -20,6 +20,15 @@
         owner: root
         group: root
         mode: '0644'
+      notify: Restart NGINX
+    - name: Add nginx configuration
+      copy:
+        src: files/nginx.conf
+        dest: /etc/nginx/nginx.conf
+        owner: root
+        group: root
+        mode: '0644'
+      notify: Restart NGINX
     - name: Enable website configuration
       file:
         src: /etc/nginx/sites-available/10_kubernetes_reverse_proxy_lb
@@ -30,3 +39,8 @@
         name: nginx
         state: started
         enabled: yes
+  handlers:
+    - name: Restart NGINX
+      service:
+        name: nginx
+        state: restarted

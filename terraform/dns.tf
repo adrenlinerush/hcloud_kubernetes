@@ -5,7 +5,7 @@ resource "hetznerdns_zone" "dns_zone" {
 
 resource "hetznerdns_record" "k8s" {
     zone_id = hetznerdns_zone.dns_zone.id
-    name = "*.k8s"
+    name = "*.k3s"
     value = hcloud_server.k3s_bastion.ipv4_address
     type = "A"
     ttl = 60

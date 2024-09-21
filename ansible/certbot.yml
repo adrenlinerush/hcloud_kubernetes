@@ -38,7 +38,7 @@
         content: "{{ lookup('ansible.builtin.env', 'TF_VAR_hcloud_dns_token') }}"
         dest: /etc/hetzner-dns-token
     - name: 'Get certificate'
-      command: '/usr/bin/certbot certonly --manual --preferred-challenges=dns --manual-auth-hook /usr/local/bin/certbot-hetzner-auth.sh --manual-cleanup-hook /usr/local/bin/certbot-hetzner-cleanup.sh -d "*.k8s.{{ domain_name }}"'
+      command: '/usr/bin/certbot certonly --manual --preferred-challenges=dns --manual-auth-hook /usr/local/bin/certbot-hetzner-auth.sh --manual-cleanup-hook /usr/local/bin/certbot-hetzner-cleanup.sh -d "*.k3s.{{ domain_name }}"'
       args:
         creates: '/etc/letsencrypt/live/k8s.{{ domain_name }}'
       ignore_errors: true

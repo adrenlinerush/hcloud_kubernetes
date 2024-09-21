@@ -1,11 +1,13 @@
 upstream k8s {    
+  hash $remote_addr;
+
   {% for host in groups['k3s'] %}
   server {{ hostvars[host].ansible_host }};
   {% endfor %}
 }
 server {    
   listen 80;    
-  server_name *.k8s.{{ domain_name}};
+  server_name *.k3s.{{ domain_name}};
   location / {       
     proxy_pass http://k8s;   
     proxy_buffering off; proxy_ignore_headers "X-Accel-Buffering";
@@ -19,12 +21,10 @@ server {
 server {    
   listen 443 ssl;    
   listen 5000 ssl;    
-  server_name *.k8s.{{ domain_name}};
+  server_name *.k3s.{{ domain_name}};
 
-  ssl_certificate /etc/letsencrypt/live/k8s.{{ domain_name }}/fullchain.pem;
-  ssl_certificate_key /etc/letsencrypt/live/k8s.{{ domain_name }}/privkey.pem;
-
-  client_max_body_size 0;
+  ssl_certificate /etc/letsencrypt/live/k3s.{{ domain_name }}/fullchain.pem;
+  ssl_certificate_key /etc/letsencrypt/live/k3s.{{ domain_name }}/privkey.pem;
 
   location / {       
     proxy_pass http://k8s;   
