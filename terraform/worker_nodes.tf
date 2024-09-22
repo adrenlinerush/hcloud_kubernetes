@@ -3,6 +3,7 @@ data "template_file" "worker_init" {
 
   vars = {
    k3s_cluster_token = "${var.k3s_cluster_token}"
+   domain_name = "${var.dns_name}"
   }
 }
 

@@ -3,7 +3,7 @@ data "template_file" "bastion_init" {
 
   vars = {
    id_rsa = file("~/.ssh/id_rsa")
-   k3s_cluster_token = "${var.k3s_cluster_token}"
+   domain_name = "${var.dns_name}"
   }
 }
 

@@ -1,6 +1,7 @@
 #cloud-config
 packages:
   - curl
+  - vim
 write_files:
   - path: /root/.ssh/id_rsa
     content: |
@@ -9,6 +10,7 @@ write_files:
 runcmd:
   - iptables -t nat -A POSTROUTING -s '10.0.1.0/24' -o eth0  -j MASQUERADE
   - echo 1 > /proc/sys/net/ipv4/ip_forward
+  - echo "10.0.1.2 registry.${domain_name}" >> /etc/hosts
   - apt-get update -y
   - curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/arm64/kubectl"
   - install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl

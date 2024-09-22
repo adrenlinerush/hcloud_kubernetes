@@ -5,10 +5,12 @@ metadata:
   namespace: container-registry
 spec:
   entryPoints:
-    - web
+    - websecure
   routes:
-    - match: Host(`registry.k3s.{{ domain_name }}`)
+    - match: Host(`registry.{{ domain_name }}`)
       kind: Rule
       services:
         - name: container-registry-docker-registry
           port: 5000
+  tls:
+    secretName: registry-cert

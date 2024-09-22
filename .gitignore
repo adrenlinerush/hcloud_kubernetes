@@ -9,3 +9,4 @@ ansible/inventory
 ansible/files/10_kubernetes_reverse_proxy_lb
 ansible/dev.yml
 ansible/prod.yml
+ansible/files/letsencrypt/

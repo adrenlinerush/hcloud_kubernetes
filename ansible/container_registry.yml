@@ -47,6 +47,29 @@
       ansible.builtin.template:
         src: templates/registry-ingress.yaml
         dest: /root/registry-ingress.yaml
+    - name: Slurp fullchain.pem from the target host
+      slurp:
+        src: "/etc/letsencrypt/live/{{ domain_name }}/fullchain.pem"
+      register: fullchain_content
+
+    - name: Slurp privkey.pem from the target host
+      slurp:
+        src: "/etc/letsencrypt/live/{{ domain_name }}/privkey.pem"
+      register: privkey_content
+
+    - name: Create Kubernetes secret for TLS certificate
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Secret
+          metadata:
+            name: registry-cert
+            namespace: container-registry
+          data:
+            tls.crt: "{{ fullchain_content['content'] }}"
+            tls.key: "{{ privkey_content['content'] }}"
+          type: kubernetes.io/tls
     - name: create ingress
       kubernetes.core.k8s:
         state: present

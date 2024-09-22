@@ -3,6 +3,7 @@ packages:
   - curl
 runcmd:
   - apt-get update -y
+  - echo "10.0.1.2 registry.${domain_name}" >> /etc/hosts
   - echo "nameserver 4.2.2.1" > /etc/resolv.conf
   - echo "nameserver 8.8.8.8" >> /etc/resolv.conf
   - ip route add default via 10.0.1.1

@@ -7,7 +7,7 @@ upstream k8s {
 }
 server {    
   listen 80;    
-  server_name *.k3s.{{ domain_name}};
+  server_name *.{{ domain_name}};
   location / {       
     proxy_pass http://k8s;   
     proxy_buffering off; proxy_ignore_headers "X-Accel-Buffering";
@@ -20,11 +20,10 @@ server {
 
 server {    
   listen 443 ssl;    
-  listen 5000 ssl;    
-  server_name *.k3s.{{ domain_name}};
+  server_name *.{{ domain_name}};
 
-  ssl_certificate /etc/letsencrypt/live/k3s.{{ domain_name }}/fullchain.pem;
-  ssl_certificate_key /etc/letsencrypt/live/k3s.{{ domain_name }}/privkey.pem;
+  ssl_certificate /etc/letsencrypt/live/{{ domain_name }}/fullchain.pem;
+  ssl_certificate_key /etc/letsencrypt/live/{{ domain_name }}/privkey.pem;
 
   location / {       
     proxy_pass http://k8s;   
