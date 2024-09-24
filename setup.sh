@@ -1,6 +1,6 @@
 #/bin/bash
 
-ansible-galaxy collection install kubernetes.core community.general
+ansible-galaxy collection install kubernetes.core community.dns
 ANSIBLE_STDOUT_CALLBACK=yaml
 
 source .env-devl
